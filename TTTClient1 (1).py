@@ -8,7 +8,7 @@ import threading
 class Network:
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server = "10.64.109.16"
+        self.server = "10.0.0.15"
         self.port = 5555
         self.addr = (self.server, self.port)
         self.id = self.client.connect(self.addr)
