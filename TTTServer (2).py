@@ -13,12 +13,6 @@ s.bind(("0.0.0.0", port))
 s.listen()
 print("Waiting for a connection, Server Started")
 
-
-
-
-def read_pos(str):
-    str = str.split(",")
-    return int(str[0]), int(str[1])
     
 
 def threaded_client(conn, conn2):
