@@ -50,10 +50,7 @@ def WhatPos(pos):
     arrpos = [0, 0]
     arrpos[0] = int(x / 100)
     arrpos[1] = int(y / 100)
-    try:
-        return arrpos
-    except:
-        print('You cant click there!')
+    return arrpos
 
 def DRAW(display, exes, circles):
     radius = 30
