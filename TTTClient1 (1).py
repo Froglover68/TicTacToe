@@ -35,10 +35,10 @@ def BoardWipe(display, exes, circles):
     for i in range(3):
         for j in range(3):
             boardreg[i][j] = 0
-    
-    
-    
-    
+        
+        
+        
+            
 
     counter = 1
 
@@ -50,10 +50,7 @@ def WhatPos(pos):
     arrpos = [0, 0]
     arrpos[0] = int(x / 100)
     arrpos[1] = int(y / 100)
-    try:
-        return arrpos
-    except:
-        print('You cant click there!')
+    return arrpos
 
 def DRAW(display, exes, circles):
     radius = 30
@@ -61,7 +58,7 @@ def DRAW(display, exes, circles):
     height = 300
     black = pygame.Color(0, 0, 0)
     display.fill(black)
-
+    
 
     # redraw all circles again (because it was clear line above)
     c = pygame.Color(154, 101, 187)
@@ -328,7 +325,7 @@ def main():
                 Tie(display)
                    
 
-
+       
 
 
 
