@@ -33,7 +33,7 @@ def threaded_client(conn, conn2):
 
             conn2.send(str.encode(reply))
         except:
-            Break
+            break
 
     print("Lost connection")
     conn.close()
