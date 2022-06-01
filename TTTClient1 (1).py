@@ -93,7 +93,44 @@ def DRAW(display, exes, circles):
     
     pygame.display.update()
 
-
+def draw_c4(display, exes, circles):
+    radius =30
+    width = 700
+    height = 600
+    black = pygame.Color(0, 0, 0)
+    display.fill(black)
+    
+    c = pygame.Color(0, 0, 255)
+    
+    for i in circles:
+        pygame.draw.circle(display, c, i, radius)
+    
+    for i in exes:
+        c = pygame.Color(255, 0, 0)
+        pygame.draw.circle(display, c, i, radius)
+    
+    c = pygame.Color(250,250,255)  #white
+    
+    
+    y = 100
+    x = 100
+    for i in range(0, 2):
+        start = (x, 0)
+        end = (x, height)
+        line_width = 4
+        pygame.draw.line(display, c, start, end, line_width)
+        x = x + 100
+    for i in range(0, 2):
+        start = (0, y)
+        end = (width, y)
+        line_width = 4
+        pygame.draw.line(display, c, start, end, line_width)
+        y = y + 100
+    
+    rect = (0, 300, 300, 100)
+    pygame.draw.rect(display, c, rect)
+    
+    pygame.display.update()
 
 
 def IsGame():
