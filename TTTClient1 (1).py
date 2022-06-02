@@ -18,6 +18,7 @@ class Network:
 boardreg = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0]]
 counter = 1
 affirm = ['False', 'False']
+# game = 0
 
 
 #פונקציות
@@ -114,26 +115,26 @@ def draw_c4(display, exes, circles):
     
     y = 100
     x = 100
-    for i in range(0, 2):
+    for i in range(0, 6):
         start = (x, 0)
         end = (x, height)
         line_width = 4
         pygame.draw.line(display, c, start, end, line_width)
         x = x + 100
-    for i in range(0, 2):
+    for i in range(0, 5):
         start = (0, y)
         end = (width, y)
         line_width = 4
         pygame.draw.line(display, c, start, end, line_width)
         y = y + 100
     
-    rect = (0, 300, 300, 100)
+    rect = (0, display.get_height() - 100, display.get_width()-100, 100)
     pygame.draw.rect(display, c, rect)
     
     pygame.display.update()
 
 
-def is_game():
+def is_game_ttt():
     global counter
     global boardreg
     if counter >= 4:
@@ -185,21 +186,21 @@ def opponent_waiting(display):
 def turn_flag(display):
     global p2
     global counter
-    rect = (0, 300, 300, 100)
+    rect = (0, display.get_height() - 100, display.get_width(), 100)
     c = pygame.Color(0,0,200)
     font = pygame.font.SysFont("comicsansms", 32)
-    if(is_game() == True or counter == 10):
+    if(is_game_ttt() == True or counter == 10):
         c = pygame.Color(0, 0, 0)
     else:
         c = pygame.Color(0,0,200)
     if((p2 == False and counter % 2 != 0) or(p2 != False and counter % 2 == 0)):
         pygame.draw.rect(display, c, rect)
         text1 = font.render("Your move!", True, (0, 0, 0))
-        display.blit(text1, (150 - text1.get_width() // 2, 350 - text1.get_height() // 2))
+        display.blit(text1, (display.get_width()/2 - text1.get_width() // 2, display.get_height() - 50 - text1.get_height() // 2))
     else: 
         pygame.draw.rect(display, c, rect)
         text1 = font.render("Oppenent's move!", True, (0, 0, 0))
-        display.blit(text1, (150 - text1.get_width() // 2, 350 - text1.get_height() // 2))
+        display.blit(text1, (display.get_width()/2 - text1.get_width() // 2, display.get_height() - 50 - text1.get_height() // 2))
     pygame.display.update()
 
 
@@ -207,8 +208,8 @@ def end_game(display):
     global boardreg
     global counter
     font = pygame.font.SysFont("comicsansms", 32)
-    text1 = font.render("circle win :)", True, (154, 101, 187))
-    text2 = font.render("X win :)", True, (255,105,180))
+    text1 = font.render("Player 1 win :)", True, (154, 101, 187))
+    text2 = font.render("Player 2 win :)", True, (255,105,180))
     c = pygame.Color(0, 0, 0)
     display.fill(c)
     if (counter % 2 == 0):
@@ -224,6 +225,30 @@ def end_game(display):
         display.blit(text2, (100 - text2.get_width() // 2, 140 - text2.get_height() // 2))
         print('Xs win!')
     pygame.display.update()
+
+def menu_ui(display):
+    font = pygame.font.SysFont("comicsansms", 32)
+    text1 = font.render("PyGame Box", True, (255, 255, 255))
+    c = pygame.Color(0, 0, 0)
+    
+    text2 = font.render("Tic Tac Toe", True, c)
+    text3 = font.render("Connect 4", True, c)
+    
+    display.fill(c)
+    display.blit(text1, (150 - text1.get_width() // 2, 50 - text1.get_height() // 2))
+    
+    c = pygame.Color(0, 0, 255)
+    pygame.draw.rect(display, c, pygame.Rect(20, 100, 260, 100))
+    display.blit(text2, (150 - text2.get_width() // 2, 150 - text2.get_height() // 2))
+    
+    pygame.draw.rect(display, c, pygame.Rect(20, 210, 260, 100))
+    display.blit(text3, (150 - text3.get_width() // 2, 260 - text3.get_height() // 2))
+    
+    
+    
+    
+    pygame.display.update()
+
 
 def RecieveThread(client, display, exes, circles):
     global counter
@@ -266,9 +291,9 @@ def RecieveThread(client, display, exes, circles):
                 else:
                     exes.append(pos)
                     counter = counter + 1
-                print(is_game())
+                print(is_game_ttt())
                 draw_ttt(display, exes, circles)
-                if (is_game() == True): ###############################################################
+                if (is_game_ttt() == True): ###############################################################
                     end_game(display)
 
             
@@ -287,9 +312,9 @@ def main():
     width = 300
     height = 400
     pygame.init()
-    # clock = pygame.time.Clock()
+    
     display = pygame.display.set_mode((width, height))
-    pygame.display.set_caption("Client_TTT")
+    pygame.display.set_caption("Client_PyGamebox")
     global p2
     global affirm
     global boardreg
@@ -299,10 +324,10 @@ def main():
     p2 = False
     n = Network()
     
-    draw_ttt(display, exes, circles)
+    
     recieve_thread = threading.Thread(target=RecieveThread, args=(n.client, display, exes, circles,))
     recieve_thread.start()
-    
+    draw_ttt(display, exes, circles)
     
     while True:
         turn_flag(display)
@@ -352,9 +377,9 @@ def main():
                     print('You cant click there!')
                 draw_ttt(display, exes, circles)
                 print("drawing")
-                if (is_game() == True): ###############################################################
+                if (is_game_ttt() == True): ###############################################################
                     end_game(display)
-            if (counter == 10 and is_game() == False):
+            if (counter == 10 and is_game_ttt() == False):
                 tie(display)
                    
 
