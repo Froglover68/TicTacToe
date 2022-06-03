@@ -335,6 +335,7 @@ def main():
     while True:
         if (game == 1):
             draw_ttt(display, exes, circles)
+            counter = 1
             while (game == 1):
                 turn_flag(display)
                 for event in pygame.event.get():
@@ -410,17 +411,18 @@ def main():
                            draw_ttt(display, exes, circles)
                         elif event.key == pygame.K_r:
                             print("cock")
-                    #elif event.type == pygame.MOUSEBUTTONDOWN:
-                        #print( "WORK")
-                        #pos = pygame.mouse.get_pos()
-                        #mousex = event.pos[0]
-                        #mousey = event.pos[1]
-                        #print(p2)
-                        #print(pos, mousex, mousey)
-                        #pos = (mousex, mousey)
-                        #Send(n.client, mousex, mousey)
-                        #if ((mousex >= 20 and mousex <= 260) and (mousey >= 100 and mousey <= 200)):
-                            #game = 1
+                            game = 1
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        print( "WORK")
+                        pos = pygame.mouse.get_pos()
+                        mousex = event.pos[0]
+                        mousey = event.pos[1]
+                        print(p2)
+                        print(pos, mousex, mousey)
+                        pos = (mousex, mousey)
+                        
+                        if ((mousex >= 20 and mousex <= 260) and (mousey >= 100 and mousey <= 200)):
+                            game = 1
 
 
 main()
