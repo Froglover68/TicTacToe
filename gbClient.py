@@ -14,11 +14,11 @@ class Network:
         self.id = self.client.connect(self.addr)
 
         print(self.id)
-
+#גלובלים
 boardreg = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0],[0, 0, 0, 0, 0, 0]]
 counter = 1
 affirm = ['False', 'False']
-# game = 0
+game = 0
 
 
 #פונקציות
@@ -163,24 +163,26 @@ def tie(display):
     text1 = font.render("tie!", True, (255, 255, 255))
     c = pygame.Color(0, 0, 0)
     display.fill(c)
-    display.blit(text1, (100 - text1.get_width() // 2, 100 - text1.get_height() // 2))
+    display.blit(text1, (display.get_width() / 2 - text1.get_width() // 2, 100 - text1.get_height() // 2))
     font = pygame.font.SysFont("comicsansms", 16)
     text1 = font.render("press w to play again", True, (255, 255, 255))
-    display.blit(text1, (100 - text1.get_width() // 2, 140 - text1.get_height() // 2))
+    display.blit(text1, (display.get_width() / 2 - text1.get_width() // 2, 140 - text1.get_height() // 2))
     pygame.display.update()    
 
 def waiting_for_opponent(display):
     font = pygame.font.SysFont("comicsansms", 16)
     text1 = font.render("waiting for opponent...", True, (255, 255, 255))
-    display.blit(text1, (100 - text1.get_width() // 2, 160 - text1.get_height() // 2))
+    display.blit(text1, (display.get_width() / 2 - text1.get_width() // 2, 160 - text1.get_height() // 2))
     pygame.display.update()
     
 def opponent_waiting(display):
     font = pygame.font.SysFont("comicsansms", 14)
     text1 = font.render("your opponent wants to reset the game", True, (255, 255, 255))
-    display.blit(text1, (100 - text1.get_width() // 2, 160 - text1.get_height() // 2))
+    display.blit(text1, (display.get_width() / 2 - text1.get_width() // 2, display.get_height() / 3 - text1.get_height() // 2))
     text1 = font.render("press 'w' to accept", True, (255, 255, 255))
-    display.blit(text1, (100 - text1.get_width() // 2, 175 - text1.get_height() // 2))
+    display.blit(text1, (display.get_width() / 2 - text1.get_width() // 2, display.get_height() / 3 + 30 - text1.get_height() // 2))
+    text1 = font.render("press 'n' to decline", True, (255, 255, 255))
+    display.blit(text1, (display.get_width() / 2 - text1.get_width() // 2, display.get_height() / 3 + 60 - text1.get_height() // 2))
     pygame.display.update()
 
 def turn_flag(display):
@@ -213,16 +215,16 @@ def end_game(display):
     c = pygame.Color(0, 0, 0)
     display.fill(c)
     if (counter % 2 == 0):
-        display.blit(text1, (100 - text1.get_width() // 2, 100 - text1.get_height() // 2))
+        display.blit(text1, (display.get_width() / 2 - text1.get_width() // 2, display.get_height() / 3 - text1.get_height() // 2))
         font = pygame.font.SysFont("comicsansms", 16)
         text1 = font.render("press w to play again", True, (255, 255, 255))
-        display.blit(text1, (100 - text1.get_width() // 2, 140 - text1.get_height() // 2))
+        display.blit(text1, (display.get_width() / 2 - text1.get_width() // 2, display.get_height() / 3 + 50 - text1.get_height() // 2))
         print('Circles win!')
     else:
-        display.blit(text2, (100 - text2.get_width() // 2, 100 - text2.get_height() // 2))
+        display.blit(text2, (display.get_width() / 2 - text2.get_width() // 2, display.get_height() / 3 - text2.get_height() // 2))
         font = pygame.font.SysFont("comicsansms", 16)
         text2 = font.render("press w to play again", True, (255, 255, 255))
-        display.blit(text2, (100 - text2.get_width() // 2, 140 - text2.get_height() // 2))
+        display.blit(text2, (display.get_width() / 2 - text2.get_width() // 2, display.get_height() / 3 + 50 - text2.get_height() // 2))
         print('Xs win!')
     pygame.display.update()
 
@@ -271,9 +273,9 @@ def RecieveThread(client, display, exes, circles):
         elif (p2pos == ['False', 'True']):
             affirm[1] = 'True'
             opponent_waiting(display)
-        
-        
-        
+        elif (p2pos == ['False', 'False']):
+            affirm = ['False', 'False']
+            draw_ttt(display,exes, circles)
        
         
         
@@ -319,6 +321,7 @@ def main():
     global affirm
     global boardreg
     global counter
+    global game
     circles = []
     exes = []
     p2 = False
@@ -327,64 +330,97 @@ def main():
     
     recieve_thread = threading.Thread(target=RecieveThread, args=(n.client, display, exes, circles,))
     recieve_thread.start()
-    draw_ttt(display, exes, circles)
+    
     
     while True:
-        turn_flag(display)
-        if affirm == ['True', 'True']:
-            board_wipe(display, exes, circles)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                print("bye")
-                sys.exit()
-            elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_w:
-                    affirm[0] = 'True'
-                    Send(n.client, affirm[1], affirm[0])#####
-                    
-                    waiting_for_opponent(display)
-                    
+        if (game == 1):
+            draw_ttt(display, exes, circles)
+            while (game == 1):
+                turn_flag(display)
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        print("bye")
+                        sys.exit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_w:
+                            affirm[0] = 'True'
+                            Send(n.client, affirm[1], affirm[0])#####
+                            
+                            waiting_for_opponent(display)
+                            if affirm == ['True', 'True']:
+                                board_wipe(display, exes, circles)
 
-                elif event.key == pygame.K_q:
-                    print("bye")
-                    sys.exit()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                pos = pygame.mouse.get_pos()
-                mousex = event.pos[0]
-                mousey = event.pos[1]
-                print(p2)
-                print(pos, mousex, mousey)
-                c = pygame.Color(200, 0, 0)
-                pos = (mousex, mousey)
-                try:
-                    if boardreg[what_pos(pos)[0]][what_pos(pos)[1]] == 0:
-                        if(p2 == False and counter % 2 != 0):
-                            boardreg[what_pos(pos)[0]][what_pos(pos)[1]] = counter % 2 + 1
-                            print(counter % 2)
-                            circles.append(pos)
-                            Send(n.client, mousex, mousey)
-                            counter = counter + 1
-                            print("o appended")
+                        elif event.key == pygame.K_n:
+                           affirm = ['False', 'False']
+                           Send(n.client, affirm[1], affirm[0])
+                           draw_ttt(display, exes, circles)
+                    elif event.type == pygame.MOUSEBUTTONDOWN:
+                        pos = pygame.mouse.get_pos()
+                        mousex = event.pos[0]
+                        mousey = event.pos[1]
+                        print(p2)
+                        print(pos, mousex, mousey)
+                        pos = (mousex, mousey)
+                        try:
+                            if boardreg[what_pos(pos)[0]][what_pos(pos)[1]] == 0:
+                                if(p2 == False and counter % 2 != 0):
+                                    boardreg[what_pos(pos)[0]][what_pos(pos)[1]] = counter % 2 + 1
+                                    print(counter % 2)
+                                    circles.append(pos)
+                                    Send(n.client, mousex, mousey)
+                                    counter = counter + 1
+                                    print("o appended")
 
-                        if(p2 != False and counter % 2 == 0):
-                            boardreg[what_pos(pos)[0]][what_pos(pos)[1]] = counter % 2 + 1
-                            print(counter % 2)
-                            exes.append(pos)
-                            Send(n.client, mousex, mousey)
-                            counter = counter + 1
-                            print("x appended")
-                except:
-                    print('You cant click there!')
-                draw_ttt(display, exes, circles)
-                print("drawing")
-                if (is_game_ttt() == True): ###############################################################
-                    end_game(display)
-            if (counter == 10 and is_game_ttt() == False):
-                tie(display)
-                   
+                                if(p2 != False and counter % 2 == 0):
+                                    boardreg[what_pos(pos)[0]][what_pos(pos)[1]] = counter % 2 + 1
+                                    print(counter % 2)
+                                    exes.append(pos)
+                                    Send(n.client, mousex, mousey)
+                                    counter = counter + 1
+                                    print("x appended")
+                        except:
+                            print('You cant click there!')
+                        draw_ttt(display, exes, circles)
+                        print("drawing")
+                        if (is_game_ttt() == True): ###############################################################
+                            end_game(display)
+                    if (counter == 10 and is_game_ttt() == False):
+                        tie(display)
 
-       
 
+        elif (game ==0):
+            menu_ui(display)
+            while game == 0:
+                for event in pygame.event.get():
+                    if event.type == pygame.QUIT:
+                        print("bye")
+                        sys.exit()
+                    elif event.type == pygame.KEYDOWN:
+                        if event.key == pygame.K_w:
+                            affirm[0] = 'True'
+                            Send(n.client, affirm[1], affirm[0])#####
+                            
+                            waiting_for_opponent(display)
+                            if affirm == ['True', 'True']:
+                                board_wipe(display, exes, circles)
+
+                        elif event.key == pygame.K_n:
+                           affirm = ['False', 'False']
+                           Send(n.client, affirm[1], affirm[0])
+                           draw_ttt(display, exes, circles)
+                        elif event.key == pygame.K_r:
+                            print("cock")
+                    #elif event.type == pygame.MOUSEBUTTONDOWN:
+                        #print( "WORK")
+                        #pos = pygame.mouse.get_pos()
+                        #mousex = event.pos[0]
+                        #mousey = event.pos[1]
+                        #print(p2)
+                        #print(pos, mousex, mousey)
+                        #pos = (mousex, mousey)
+                        #Send(n.client, mousex, mousey)
+                        #if ((mousex >= 20 and mousex <= 260) and (mousey >= 100 and mousey <= 200)):
+                            #game = 1
 
 
 main()
