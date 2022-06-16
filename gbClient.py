@@ -39,15 +39,15 @@ def board_wipe(display, exes, circles):
     circles.clear()
     exes.clear()
     affirm = ['False', 'False']
-    for i in range(3):
-        for j in range(3):
+    for i in range(7):
+        for j in range(6):
             boardreg[i][j] = 0
 
     counter = 1
-    if (game == 1):
+    if game == 1:
         draw_ttt(display, exes, circles)
-    elif (game == 2):
-        draw_c4(display, exes, circles)
+    elif game == 2:
+        draw_c4(display)
     else:
         menu_ui(display)
 
@@ -65,13 +65,10 @@ def drop_piece(pos):
     global boardreg
 
     x = int(pos[0] / 100)
-    y = int(pos[1] / 100)
-    arrpos = [0, 0]
-    for i in range(5, -1 ,-1):
+    for i in range(5, -1, -1):
         if boardreg[x][i] == 0:
-            arrpos = [x,i]
+            arrpos = [x, i]
             return arrpos
-
 
     return False
 
@@ -125,13 +122,13 @@ def draw_ttt(display, exes, circles):
     pygame.display.update()
 
 
-def draw_c4(display, exes, circles):
+def draw_c4(display):
     radius = 30
     width = 700
     height = 600
     black = pygame.Color(0, 0, 0)
     display.fill(black)
-    
+
     for x in range(7):
         for y in range(6):
             if boardreg[x][y] == 1:
@@ -185,6 +182,44 @@ def is_game_ttt():
     return False
 
 
+def c4_row():
+    global boardreg
+    for x in range(6):
+        for i in range(3):
+            if boardreg[i][x] == boardreg[i + 1][x] == boardreg[i + 2][x] == boardreg[i + 3][x] != 0:
+                return True
+    return False
+
+
+def c4_column():
+    global boardreg
+    for x in range(7):
+        for i in range(3):
+            if boardreg[x][i] == boardreg[x][i + 1] == boardreg[x][i + 2] == boardreg[x][i + 3] != 0:
+                return True
+
+
+def c4_diagonal():
+    global boardreg
+    for i in range(4):
+        for x in range(3):
+            if boardreg[i][x] == boardreg[i + 1][x + 1] == boardreg[i + 2][x + 2] == boardreg[i + 3][x + 3] != 0:
+                return True
+    for i in range(6,2, -1):
+        for x in range(3):
+            print(i, x)
+            if boardreg[i][x] == boardreg[i - 1][x + 1] == boardreg[i - 2][x + 2] == boardreg[i - 3][x + 3] != 0:
+                return True
+    return False
+
+
+def is_game_c4():
+    global boardreg
+    if c4_column() or c4_row() or c4_diagonal():
+        return True
+    return False
+
+
 def tie(display):
     global counter
 
@@ -231,10 +266,10 @@ def waiting_for_opponent_menu(display):
 def turn_flag(display):
     global p2
     global counter
+    global game
     rect = (0, display.get_height() - 100, display.get_width(), 100)
-    c = pygame.Color(0, 0, 200)
     font = pygame.font.SysFont("comicsansms", 32)
-    if (is_game_ttt() == True or counter == 10):
+    if ((is_game_ttt() or counter == 10) and game == 1):
         c = pygame.Color(0, 0, 0)
     else:
         c = pygame.Color(0, 0, 200)
@@ -325,16 +360,23 @@ def RecieveThread(client, display, exes, circles):
             if (game == 1):
                 draw_ttt(display, exes, circles)
             elif (game == 2):
-                draw_c4(display, exes, circles)
+                draw_c4(display)
             else:
                 menu_ui(display)
-       
+
         if (p2pos[0] == 'TTT'):
             game_sel[1] = 'TTT'
-            
-      
         if (game_sel == ['TTT', 'TTT']):
             game = 1
+        if (p2pos[0] == 'C4'):
+            game_sel[1] = 'C4'
+        if (game_sel == ['C4', 'C4']):
+            game = 2
+        if (p2pos[0] == 'Menu'):
+            game_sel[1] = 'Menu'
+        if (game_sel == ['Menu', 'Menu']):
+            game = 0
+
         if (game == 1):
             try:
                 pos = (int(p2pos[0]), int(p2pos[1]))
@@ -365,7 +407,7 @@ def RecieveThread(client, display, exes, circles):
                 if boardreg[drop_piece(pos)[0]][drop_piece(pos)[1]] == 0:
 
                     boardreg[drop_piece(pos)[0]][drop_piece(pos)[1]] = counter % 2 + 1
-                   
+
                     if counter % 2 != 0:
                         circles.append(drop_piece_graph(pos))
                         counter = counter + 1
@@ -373,9 +415,10 @@ def RecieveThread(client, display, exes, circles):
                     else:
                         exes.append(drop_piece_graph(pos))
                         counter = counter + 1
-                   
-                    draw_c4(display, exes, circles)
-                   
+
+                    draw_c4(display)
+                    if (is_game_c4() == True):  ###############################################################
+                        end_game(display)
 
             except:
                 pass
@@ -384,7 +427,6 @@ def RecieveThread(client, display, exes, circles):
 def Send(client, mousex, mousey):
     msg = str(mousex) + "," + str(mousey)
     client.send(msg.encode('utf-8'))
-    
 
 
 def main():
@@ -430,6 +472,15 @@ def main():
                         elif event.key == pygame.K_n:
                             affirm = ['False', 'False']
                             Send(n.client, affirm[1], affirm[0])
+                            game_sel = ['TTT', 'TTT']
+                            Send(n.client, affirm[1], affirm[0])
+                            draw_ttt(display, exes, circles)
+
+                        elif event.key == pygame.K_m:
+                            game_sel[0] = 'Menu'
+                            Send(n.client, game_sel[0], 0)
+                            if (game_sel == ['Menu', 'Menu']):
+                                game = 0
                             draw_ttt(display, exes, circles)
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         pos = pygame.mouse.get_pos()
@@ -465,7 +516,7 @@ def main():
 
         elif (game == 2):
             display = pygame.display.set_mode((700, 700))
-            draw_c4(display, exes, circles)
+            draw_c4(display)
             while (game == 2):
                 turn_flag(display)
                 for event in pygame.event.get():
@@ -483,7 +534,16 @@ def main():
                         elif event.key == pygame.K_n:
                             affirm = ['False', 'False']
                             Send(n.client, affirm[1], affirm[0])
-                            draw_c4(display, exes, circles)
+                            game_sel = ['TTT', 'TTT']
+                            Send(n.client, affirm[1], affirm[0])
+                            draw_c4(display)
+
+                        elif event.key == pygame.K_m:
+                            game_sel[0] = 'Menu'
+                            Send(n.client, game_sel[0], 0)
+                            if (game_sel == ['Menu', 'Menu']):
+                                game = 0
+                            draw_c4(display)
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         pos = pygame.mouse.get_pos()
                         mousex = event.pos[0]
@@ -496,24 +556,29 @@ def main():
                                     circles.append(drop_piece_graph(pos))
                                     Send(n.client, mousex, mousey)
                                     counter = counter + 1
-                                    
 
                                 if (p2 != False and counter % 2 == 0):
                                     boardreg[drop_piece(pos)[0]][drop_piece(pos)[1]] = counter % 2 + 1
                                     exes.append(drop_piece_graph(pos))
                                     Send(n.client, mousex, mousey)
                                     counter = counter + 1
-                                    
+
                         except:
                             pass
-                        draw_c4(display, exes, circles)
-                       
+                        draw_c4(display)
+                        if is_game_c4():
+                            end_game(display)
                         if (counter == 43 and is_game_ttt() == False):
-                            tie(display)    
-                        
+                            tie(display)
+
         elif (game == 0):
+            display = pygame.display.set_mode((300, 400))
             menu_ui(display)
             while game == 0:
+                if (game_sel == ['C4', 'C4']):
+                    game = 2
+                if (game_sel == ['TTT', 'TTT']):
+                    game = 1
                 for event in pygame.event.get():
                     if event.type == pygame.QUIT:
                         print("bye")
@@ -531,9 +596,6 @@ def main():
                             affirm = ['False', 'False']
                             Send(n.client, affirm[1], affirm[0])
                             menu_ui(display)
-                        elif event.key == pygame.K_r:
-                            print("pressed")
-                            game = 1
                     elif event.type == pygame.MOUSEBUTTONDOWN:
                         pos = pygame.mouse.get_pos()
                         mousex = event.pos[0]
@@ -542,13 +604,14 @@ def main():
                         if ((mousex >= 20 and mousex <= 260) and (mousey >= 100 and mousey <= 200)):
                             game_sel[0] = 'TTT'
                             Send(n.client, game_sel[0], 0)
-                            if (game_sel == ['TTT', 'TTT']):
-                                game = 1
                             waiting_for_opponent_menu(display)
-                            
+
 
                         elif ((mousex >= 20 and mousex <= 260) and (mousey >= 210 and mousey <= 310)):
-                            game = 2
+                            game_sel[0] = 'C4'
+                            print(game_sel)
+                            Send(n.client, game_sel[0], 0)
+                            waiting_for_opponent_menu(display)
 
 
 main()
