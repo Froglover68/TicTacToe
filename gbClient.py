@@ -328,10 +328,13 @@ def RecieveThread(client, display, exes, circles):
                 draw_c4(display, exes, circles)
             else:
                 menu_ui(display)
-
-        if (p2pos == ['Menu', 'TTT']):
-            game_sel[1] == 'TTT'
-
+       
+        if (p2pos[0] == 'TTT'):
+            game_sel[1] = 'TTT'
+            
+      
+        if (game_sel == ['TTT', 'TTT']):
+            game = 1
         if (game == 1):
             try:
                 pos = (int(p2pos[0]), int(p2pos[1]))
@@ -538,11 +541,11 @@ def main():
                         pos = (mousex, mousey)
                         if ((mousex >= 20 and mousex <= 260) and (mousey >= 100 and mousey <= 200)):
                             game_sel[0] = 'TTT'
-                            Send(n.client, game_sel[1], game_sel[0])
-
-                            waiting_for_opponent_menu(display)
+                            Send(n.client, game_sel[0], 0)
                             if (game_sel == ['TTT', 'TTT']):
-                                game == 1
+                                game = 1
+                            waiting_for_opponent_menu(display)
+                            
 
                         elif ((mousex >= 20 and mousex <= 260) and (mousey >= 210 and mousey <= 310)):
                             game = 2
